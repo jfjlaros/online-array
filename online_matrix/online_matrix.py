@@ -48,7 +48,7 @@ class OnlineMatrix(numpy.ndarray):
     #__getitem__
 
     def __str__(self):
-        return "{} contains no data".format(self.__repr__())
+        return "{} contains no data".format(repr(self))
 
     def __repr__(self):
         return str(self.__class__)
