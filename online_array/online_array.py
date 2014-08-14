@@ -15,7 +15,7 @@ class OnlineArray(numpy.ndarray):
     accepts an array.
     """
 
-    def _make_sub_array(self, index):
+    def _sub_array(self, index):
         """
         We create a sub-array that has knowledge about its position in the
         higher dimensional arrays. This is done by passing all known indices
@@ -32,7 +32,7 @@ class OnlineArray(numpy.ndarray):
         sub_array.index = self.index + index
 
         return sub_array
-    #_make_sub_array
+    #_sub_array
 
     def __getitem__(self, index):
         """
@@ -48,13 +48,13 @@ class OnlineArray(numpy.ndarray):
         # NumPy style indexing.
         if type(index) == tuple:
             if len(index) < len(self.shape):
-                return self._make_sub_array(index)
+                return self._sub_array(index)
             return self.function(*index)
         #if
 
         # Nested list style indexing.
         if len(self.shape) > 1:
-            return self._make_sub_array((index, ))
+            return self._sub_array((index, ))
 
         # Recursion has ended, all indices are known.
         return self.function(*self.index + (index, ))
