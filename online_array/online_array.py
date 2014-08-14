@@ -75,10 +75,10 @@ def online_array(function, shape):
     Make an OnlineArray instance and initialise it.
 
     Currently, the {shape} parameter is used only for determining the number of
-    dimensions. For an unbounded array please use -1 in the {shape} tuple. For
+    dimensions. For an unbounded array please use 0 in the {shape} tuple. For
     example, an unbounded 2-dimensional array should be created with:
 
-    >>> array = online_array((-1, -1))
+    >>> array = online_array((0, 0))
 
     :arg function: General function having only integer arguments.
     :type function: function(*(int))
