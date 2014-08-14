@@ -47,8 +47,11 @@ class OnlineArray(numpy.ndarray):
 
         # NumPy style indexing.
         if type(index) == tuple:
+            # A sub-array was requested.
             if len(index) < len(self.shape):
                 return self._sub_array(index)
+
+            # An element was requested.
             return self.function(*index)
         #if
 
