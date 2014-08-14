@@ -15,6 +15,17 @@ class OnlineArray(numpy.ndarray):
     accepts a array.
     """
 
+    def _make_sub_array(self, shape, parameters):
+        number_of_parameters = len(parameters)
+
+        sub_array = OnlineArray(self.shape[number_of_parameters:])
+        sub_array.function = self.function
+        sub_array.parameters = self.parameters + parameters
+        sub_array.dimensions = self.dimensions - number_of_parameters
+
+        return sub_array
+    #_make_sub_array
+
     def __getitem__(self, index):
         """
         Retrieve an item from the array.
@@ -25,6 +36,16 @@ class OnlineArray(numpy.ndarray):
 
         # NumPy style indexing.
         if type(index) == tuple:
+            number_of_parameters = len(index)
+
+            if number_of_parameters < self.dimensions:
+                sub_array = OnlineArray(self.shape[number_of_parameters:])
+                sub_array.function = self.function
+                sub_array.parameters = self.parameters + index
+                sub_array.dimensions = self.dimensions - number_of_parameters
+
+                return sub_array
+            #if
             return self.function(*index)
 
         # Nested list style indexing.
