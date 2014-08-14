@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This module provides a array-like object that calls an arbitrary function when
+This module provides an array-like object that calls an arbitrary function when
 the value of an element is requested.
 """
 
@@ -11,28 +11,25 @@ class OnlineArray(numpy.ndarray):
     """
     This class mimics a multidimensional numpy array, except it does not store
     any data, instead all values are calculated on the fly. This can be
-    convenient when a array gets too large and the receiving function only
-    accepts a array.
+    convenient when an array gets too large and the receiving function only
+    accepts an array.
     """
 
-    def _make_sub_array(self, parameters):
+    def _make_sub_array(self, index):
         """
         We create a sub-array that has knowledge about its position in the
-        higher dimensional arrays. This is done by passing all known parameters
-        to the member variable {parameters} of {sub_array}.
+        higher dimensional arrays. This is done by passing all known indices
+        to the member variable {index} of {sub_array}.
 
-        :arg parameters: List on indices.
-        :type parameters: tuple(int)
+        :arg index: List on indices.
+        :type index: tuple(int)
 
         :returns: A sub-array.
         :rtype: OnlineArray
         """
-        number_of_parameters = len(parameters)
-
-        sub_array = OnlineArray(self.shape[number_of_parameters:])
+        sub_array = OnlineArray(self.shape[len(index):])
         sub_array.function = self.function
-        sub_array.parameters = self.parameters + parameters
-        sub_array.dimensions = self.dimensions - number_of_parameters
+        sub_array.index = self.index + index
 
         return sub_array
     #_make_sub_array
@@ -43,23 +40,24 @@ class OnlineArray(numpy.ndarray):
 
         :arg index: The index of the element.
         :type index: int or tuple(int)
+
+        :returns: Either a sub-array or an element.
+        :rtype: OnlineArray or unknown
         """
 
         # NumPy style indexing.
         if type(index) == tuple:
-            number_of_parameters = len(index)
-
-            if number_of_parameters < self.dimensions:
+            if len(index) < len(self.shape):
                 return self._make_sub_array(index)
             return self.function(*index)
         #if
 
         # Nested list style indexing.
-        if self.dimensions > 1:
+        if len(self.shape) > 1:
             return self._make_sub_array((index, ))
 
         # Recursion has ended, all indices are known.
-        return self.function(*self.parameters + (index, ))
+        return self.function(*self.index + (index, ))
     #__getitem__
 
     def __str__(self):
@@ -69,7 +67,7 @@ class OnlineArray(numpy.ndarray):
         return str(self.__class__)
 #OnlineArray
 
-def online_array(function, shape=()):
+def online_array(function, shape):
     """
     Make an OnlineArray instance and initialise it.
 
@@ -79,13 +77,9 @@ def online_array(function, shape=()):
         on it).
     :type shape: tuple(int)
     """
-    # We use the number of parameters of {function} to set the number of
-    # dimensions of the array.
-
     array = OnlineArray(shape)
     array.function = function
-    array.parameters = ()
-    array.dimensions = function.func_code.co_argcount
+    array.index = ()
 
     return array
 #online_array
