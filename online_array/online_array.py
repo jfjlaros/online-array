@@ -44,7 +44,6 @@ class OnlineArray(numpy.ndarray):
         :returns: Either a sub-array or an element.
         :rtype: OnlineArray or unknown
         """
-
         # NumPy style indexing.
         if type(index) == tuple:
             # A sub-array was requested.
