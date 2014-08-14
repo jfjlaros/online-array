@@ -15,7 +15,18 @@ class OnlineArray(numpy.ndarray):
     accepts a array.
     """
 
-    def _make_sub_array(self, shape, parameters):
+    def _make_sub_array(self, parameters):
+        """
+        We create a sub-array that has knowledge about its position in the
+        higher dimensional arrays. This is done by passing all known parameters
+        to the member variable {parameters} of {sub_array}.
+
+        :arg parameters: List on indices.
+        :type parameters: tuple(int)
+
+        :returns: A sub-array.
+        :rtype: OnlineArray
+        """
         number_of_parameters = len(parameters)
 
         sub_array = OnlineArray(self.shape[number_of_parameters:])
@@ -39,33 +50,16 @@ class OnlineArray(numpy.ndarray):
             number_of_parameters = len(index)
 
             if number_of_parameters < self.dimensions:
-                sub_array = OnlineArray(self.shape[number_of_parameters:])
-                sub_array.function = self.function
-                sub_array.parameters = self.parameters + index
-                sub_array.dimensions = self.dimensions - number_of_parameters
-
-                return sub_array
-            #if
+                return self._make_sub_array(index)
             return self.function(*index)
+        #if
 
         # Nested list style indexing.
         if self.dimensions > 1:
-            # We create a {dimensions} - 1 array that has knowledge
-            # about its position in the higher dimensional matrices. This is
-            # done by adding the index to the member variable {parameters} of
-            # {sub_array}, when the recursion comes to an end, the
-            # {parameters} variable will contain all but one indices.
+            return self._make_sub_array((index, ))
 
-            sub_array = OnlineArray(self.shape[1:])
-            sub_array.function = self.function
-            sub_array.parameters = self.parameters + (index, )
-            sub_array.dimensions = self.dimensions - 1
-
-            return sub_array
-        #if
         # Recursion has ended, all indices are known.
-        else:
-            return self.function(*self.parameters + (index, ))
+        return self.function(*self.parameters + (index, ))
     #__getitem__
 
     def __str__(self):
