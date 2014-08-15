@@ -47,7 +47,7 @@ class OnlineArray(numpy.ndarray):
         # NumPy style indexing.
         if type(index) == tuple:
             # A sub-array was requested.
-            if len(index) < len(self.shape):
+            if len(index) < self.ndim:
                 return self._sub_array(index)
 
             # An element was requested.
@@ -55,7 +55,7 @@ class OnlineArray(numpy.ndarray):
         #if
 
         # Nested list style indexing.
-        if len(self.shape) > 1:
+        if self.ndim > 1:
             return self._sub_array((index, ))
 
         # Recursion has ended, all indices are known.
