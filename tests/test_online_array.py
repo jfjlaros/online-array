@@ -84,4 +84,28 @@ class TestOnlineArray(object):
 
     def test_unbounded_2(self):
         assert(self.unbounded_array_1[-10] == -10)
+
+    def test_loop(self):
+        iterator = iter(self.array_1)
+
+        for i in range(10):
+            try:
+                iterator.next()
+            except StopIteration:
+                break
+        #for
+        assert(i == 5)
+    #test_loop
+
+    def test_unbounded_loop(self):
+        iterator = iter(self.unbounded_array_1)
+
+        for i in range(10):
+            try:
+                iterator.next()
+            except StopIteration:
+                break
+        #for
+        assert(i == 9)
+    #test_unbounded_loop
 #TestOnlineArray
