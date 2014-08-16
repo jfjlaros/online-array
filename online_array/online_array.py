@@ -15,7 +15,8 @@ class OnlineArray(numpy.ndarray):
     accepts an array.
     """
     def __new__(cls, shape, dtype=float, buffer=None, offset=0,
-              strides=None, order=None, function=None, index=()):
+              strides=None, order=None, function=None, index=(),
+              unbounded=False):
         """
         Constructor for OnlineArray.
 
@@ -25,11 +26,14 @@ class OnlineArray(numpy.ndarray):
         :type function: function
         :arg index: The index of this arrray in its parent array.
         :type index: tuple(int)
+        :arg unbounded: Create an unbounded array.
+        :type unbounded: bool
         """
         array = super(OnlineArray, cls).__new__(cls, shape, dtype, buffer,
             offset, strides, order)
         array.function = function
         array.index = index
+        array.unbounded = unbounded
 
         return array
     #__new__
@@ -46,22 +50,28 @@ class OnlineArray(numpy.ndarray):
         """
         # NumPy style indexing.
         if type(index) == tuple:
+            checked_index = self._check_boundaries(index)
+
             # A sub-array was requested.
-            if len(index) < self.ndim:
-                return OnlineArray(self.shape[len(index):],
-                    function=self.function, index=self.index + index)
+            if len(checked_index) < self.ndim:
+                return OnlineArray(self.shape[len(checked_index):],
+                    function=self.function, index=self.index + checked_index,
+                    unbounded=self.unbounded)
 
             # An element was requested.
-            return self.function(*index)
+            return self.function(*checked_index)
         #if
+        else:
+            checked_index = self._check_boundaries((index, ))[0]
 
         # Nested list style indexing.
         if self.ndim > 1:
             return OnlineArray(self.shape[1:],
-                function=self.function, index=self.index + (index, ))
+                function=self.function, index=self.index + (checked_index, ),
+                unbounded=self.unbounded)
 
         # Recursion has ended, all indices are known.
-        return self.function(*self.index + (index, ))
+        return self.function(*self.index + (checked_index, ))
     #__getitem__
 
     def __str__(self):
@@ -69,17 +79,28 @@ class OnlineArray(numpy.ndarray):
 
     def __repr__(self):
         return str(self.__class__)
+
+    def _check_boundaries(self, index):
+        """
+        :arg index: The index of the element.
+        :type index: tuple(int)
+        """
+        if self.unbounded:
+            return index
+
+        checked_index = ()
+        for position, value in enumerate(index):
+            if not -self.shape[position] <= value < self.shape[position]:
+                raise IndexError("index {} is out of bounds for axis {} with "
+                    "size {}".format(value, position, self.shape[position]))
+            checked_index += (value % self.shape[position], )
+        return checked_index
+    #_check_boundaries
 #OnlineArray
 
 def online_array(function, shape):
     """
     Make an OnlineArray instance and initialise it.
-
-    Currently, the {shape} parameter is used only for determining the number of
-    dimensions. For an unbounded array please use 0 in the {shape} tuple. For
-    example, an unbounded 2-dimensional array should be created with:
-
-    >>> array = online_array((0, 0))
 
     :arg function: General function having only integer arguments.
     :type function: function(*(int))
