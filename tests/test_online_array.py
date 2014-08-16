@@ -37,6 +37,26 @@ class TestOnlineArray(object):
             raise IndexError("boundary check failed")
     #_test_boundary
 
+    def _test_loop(self, array, maximum):
+        """
+        See how far a loop goes.
+
+        :arg array: A one-dimensional array.
+        :type array: OnlineArray
+        :arg maximum: Stop the test after this number of iterations.
+        :type maximum: int
+        """
+        iterator = iter(array)
+
+        for index in range(maximum):
+            try:
+                iterator.next()
+            except StopIteration:
+                break
+        #for
+        return index
+    #_test_loop
+
     def test_index_1(self):
         assert(self.array_2[2][2] == 5)
 
@@ -86,28 +106,10 @@ class TestOnlineArray(object):
         assert(self.unbounded_array_1[-10] == -10)
 
     def test_loop(self):
-        iterator = iter(self.array_1)
-
-        for i in range(10):
-            try:
-                iterator.next()
-            except StopIteration:
-                break
-        #for
-        assert(i == 5)
-    #test_loop
+        assert(self._test_loop(self.array_1, 10) == 5)
 
     def test_unbounded_loop(self):
-        iterator = iter(self.unbounded_array_1)
-
-        for i in range(10):
-            try:
-                iterator.next()
-            except StopIteration:
-                break
-        #for
-        assert(i == 9)
-    #test_unbounded_loop
+        assert(self._test_loop(self.unbounded_array_1, 10) == 9)
 
     def test_assignment(self):
         try:
