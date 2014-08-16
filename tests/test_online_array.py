@@ -118,4 +118,5 @@ class TestOnlineArray(object):
             pass
         else:
             raise TypeError("assignment check failed")
+    #test_assignment
 #TestOnlineArray
