@@ -82,8 +82,13 @@ class OnlineArray(numpy.ndarray):
 
     def _check_boundaries(self, index):
         """
+        Check the boundaries and correct for negative indices.
+
         :arg index: The index of the element.
         :type index: tuple(int)
+
+        :returns: Checked and corrected indices.
+        :rtype: tuple(int)
         """
         if self.unbounded:
             return index
