@@ -108,4 +108,12 @@ class TestOnlineArray(object):
         #for
         assert(i == 9)
     #test_unbounded_loop
+
+    def test_assignment(self):
+        try:
+            self.array_1[0] = 1
+        except TypeError:
+            pass
+        else:
+            raise TypeError("assignment check failed")
 #TestOnlineArray

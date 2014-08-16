@@ -74,6 +74,10 @@ class OnlineArray(numpy.ndarray):
         return self.function(*self.index + (checked_index, ))
     #__getitem__
 
+    def __setitem__(self, index, value):
+        raise TypeError("{} object does not support item assignment".format(
+            repr(self)))
+
     def __str__(self):
         return "{} contains no data".format(repr(self))
 
