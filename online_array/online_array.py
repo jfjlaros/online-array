@@ -1,10 +1,5 @@
 #!/usr/bin/env python
 
-"""
-This module provides an array-like object that calls an arbitrary function when
-the value of an element is requested.
-"""
-
 import numpy
 
 class OnlineArray(numpy.ndarray):
