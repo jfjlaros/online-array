@@ -14,25 +14,25 @@ class OnlineArray(numpy.ndarray):
     convenient when an array gets too large and the receiving function only
     accepts an array.
     """
-
-    def _sub_array(self, index):
+    def __new__(cls, shape, dtype=float, buffer=None, offset=0,
+              strides=None, order=None, function=None, index=()):
         """
-        We create a sub-array that has knowledge about its position in the
-        higher dimensional arrays. This is done by passing all known indices
-        to the member variable {index} of {sub_array}.
+        Constructor for OnlineArray.
 
-        :arg index: List on indices.
+        For more documentation, see the help of {ndarray}.
+
+        :arg function: General function having only integer arguments.
+        :type function: function
+        :arg index: The index of this arrray in its parent array.
         :type index: tuple(int)
-
-        :returns: A sub-array.
-        :rtype: OnlineArray
         """
-        sub_array = OnlineArray(self.shape[len(index):])
-        sub_array.function = self.function
-        sub_array.index = self.index + index
+        array = super(OnlineArray, cls).__new__(cls, shape, dtype, buffer,
+            offset, strides, order)
+        array.function = function
+        array.index = index
 
-        return sub_array
-    #_sub_array
+        return array
+    #__new__
 
     def __getitem__(self, index):
         """
@@ -48,7 +48,8 @@ class OnlineArray(numpy.ndarray):
         if type(index) == tuple:
             # A sub-array was requested.
             if len(index) < self.ndim:
-                return self._sub_array(index)
+                return OnlineArray(self.shape[len(index):],
+                    function=self.function, index=self.index + index)
 
             # An element was requested.
             return self.function(*index)
@@ -56,7 +57,8 @@ class OnlineArray(numpy.ndarray):
 
         # Nested list style indexing.
         if self.ndim > 1:
-            return self._sub_array((index, ))
+            return OnlineArray(self.shape[1:],
+                function=self.function, index=self.index + (index, ))
 
         # Recursion has ended, all indices are known.
         return self.function(*self.index + (index, ))
@@ -85,9 +87,5 @@ def online_array(function, shape):
         on it).
     :type shape: tuple(int)
     """
-    array = OnlineArray(shape)
-    array.function = function
-    array.index = ()
-
-    return array
+    return OnlineArray(shape, function=function)
 #online_array
