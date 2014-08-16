@@ -10,6 +10,8 @@ class TestOnlineArray(object):
         Create some arrays.
         """
         self.array_1 = online_array.OnlineArray((5, ), function=lambda x: x)
+        self.unbounded_array_1 = online_array.OnlineArray((0, ),
+            function=lambda x: x, unbounded=True)
         self.array_2 = online_array.OnlineArray((4, 3),
             function=lambda x, y: x + y + 1)
         self.array_3 = online_array.OnlineArray((4, 3, 5),
@@ -47,6 +49,9 @@ class TestOnlineArray(object):
         assert(row[2] == 3)
     #test_index_3
 
+    def test_index_4(self):
+        assert(self.array_1[-2] == self.array_1[3])
+
     def test_numpy_index_1(self):
         assert(self.array_2[2, 2] == 5)
 
@@ -59,6 +64,9 @@ class TestOnlineArray(object):
         assert(row[2] == 3)
     #test_index_3
 
+    def test_numpy_index_4(self):
+        assert(self.array_2[0, -2] == self.array_2[0, 1])
+
     def test_boundary_1(self):
         assert(self.array_1[4] == 4)
 
@@ -70,4 +78,10 @@ class TestOnlineArray(object):
 
     def test_boundary_4(self):
         self._test_boundary(self.array_1, -6)
+
+    def test_unbounded_1(self):
+        assert(self.unbounded_array_1[10] == 10)
+
+    def test_unbounded_2(self):
+        assert(self.unbounded_array_1[-10] == -10)
 #TestOnlineArray
