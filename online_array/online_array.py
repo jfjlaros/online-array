@@ -9,26 +9,31 @@ class OnlineArray(numpy.ndarray):
     convenient when an array gets too large and the receiving function only
     accepts an array.
     """
-    def __new__(cls, shape, dtype=float, buffer=None, offset=0,
-              strides=None, order=None, function=None, index=(),
-              unbounded=False):
+    _parameters = {
+        "function": lambda x: 0,
+        "index": (),
+        "unbounded": False
+    }
+    """ Parameters that are added to the constructor as keyword arguments. """
+
+    def __new__(cls, *args, **kwargs):
         """
         Constructor for OnlineArray.
 
         For more documentation, see the help of {ndarray}.
-
-        :arg function: General function having only integer arguments.
-        :type function: function
-        :arg index: The index of this arrray in its parent array.
-        :type index: tuple(int)
-        :arg unbounded: Create an unbounded array.
-        :type unbounded: bool
         """
-        array = super(OnlineArray, cls).__new__(cls, shape, dtype, buffer,
-            offset, strides, order)
-        array.function = function
-        array.index = index
-        array.unbounded = unbounded
+        parent_kwargs = dict(filter(lambda x: x[0] not in cls._parameters,
+            kwargs.items()))
+        array = super(OnlineArray, cls).__new__(cls, *args, **parent_kwargs)
+
+        online_array_kwargs = dict(filter(lambda x: x[0] in cls._parameters,
+            kwargs.items()))
+        for i in cls._parameters:
+            if i in online_array_kwargs:
+                setattr(array, i, online_array_kwargs[i])
+            else:
+                setattr(array, i, cls._parameters[i])
+        #for
 
         return array
     #__new__
