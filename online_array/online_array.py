@@ -43,29 +43,22 @@ class OnlineArray(numpy.ndarray):
         :returns: Either a sub-array or an element.
         :rtype: OnlineArray or unknown
         """
-        # NumPy style indexing.
         if type(index) == tuple:
-            checked_index = self._check_boundaries(index)
+            # NumPy style indexing.
+            checked_index = self._check_boundaries(index[0])
 
-            # A sub-array was requested.
-            if len(checked_index) < self.ndim:
-                return OnlineArray(self.shape[len(checked_index):],
-                    function=self.function, index=self.index + checked_index,
-                    unbounded=self.unbounded)
-
-            # An element was requested.
-            return self.function(*checked_index)
+            if len(index) > 1:
+                return OnlineArray(self.shape[1:], function=self.function,
+                    index=self.index + (checked_index, ),
+                    unbounded=self.unbounded)[index[1:]]
         #if
         else:
-            checked_index = self._check_boundaries((index, ))[0]
+            checked_index = self._check_boundaries(index)
 
-        # Nested list style indexing.
         if self.ndim > 1:
-            return OnlineArray(self.shape[1:],
-                function=self.function, index=self.index + (checked_index, ),
-                unbounded=self.unbounded)
+            return OnlineArray(self.shape[1:], function=self.function,
+                index=self.index + (checked_index, ), unbounded=self.unbounded)
 
-        # Recursion has ended, all indices are known.
         return self.function(*self.index + (checked_index, ))
     #__getitem__
 
@@ -84,21 +77,19 @@ class OnlineArray(numpy.ndarray):
         Check the boundaries and correct for negative indices.
 
         :arg index: The index of the element.
-        :type index: tuple(int)
+        :type index: int
 
         :returns: Checked and corrected indices.
-        :rtype: tuple(int)
+        :rtype: int
         """
         if self.unbounded:
             return index
 
-        checked_index = ()
-        for position, value in enumerate(index):
-            if not -self.shape[position] <= value < self.shape[position]:
-                raise IndexError("index {} is out of bounds for axis {} with "
-                    "size {}".format(value, position, self.shape[position]))
-            checked_index += (value % self.shape[position], )
-        return checked_index
+        if not -self.shape[0] <= index < self.shape[0]:
+            raise IndexError("index {} is out of bounds for axis {} with "
+                "size {}".format(index, self.ndim - 1, self.shape[0]))
+
+        return index % self.shape[0]
     #_check_boundaries
 #OnlineArray
 
