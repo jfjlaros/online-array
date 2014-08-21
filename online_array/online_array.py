@@ -50,9 +50,10 @@ class OnlineArray(numpy.ndarray):
         :rtype: OnlineArray or unknown
         """
         if type(index) == slice:
-            return OnlineArray(self.shape, function=self.function,
-                index=self.index, unbounded=self.unbounded,
-                start=self.start + index.start, step=self.step * index.step)
+            return OnlineArray((self.shape[0] - index.start,) + self.shape[1:],
+                function=self.function, index=self.index,
+                unbounded=self.unbounded, start=self.start + index.start,
+                step=self.step * index.step)
         #if
 
         if type(index) == tuple:
@@ -97,16 +98,14 @@ class OnlineArray(numpy.ndarray):
         :returns: Checked and corrected indices.
         :rtype: int
         """
-        result = index * self.step + self.start
-
         if self.unbounded:
-            return result
+            return index * self.step + self.start
 
         if not -self.shape[0] <= index < self.shape[0]:
             raise IndexError("index {} is out of bounds for axis {} with "
                 "size {}".format(index, self.ndim - 1, self.shape[0]))
 
-        return result % self.shape[0]
+        return (index % self.shape[0]) * self.step + self.start
     #_check_boundaries
 #OnlineArray
 
