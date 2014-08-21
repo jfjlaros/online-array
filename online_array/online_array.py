@@ -9,9 +9,9 @@ class OnlineArray(numpy.ndarray):
     convenient when an array gets too large and the receiving function only
     accepts an array.
     """
-    def __new__(cls, shape, dtype=float, buffer=None, offset=0,
-              strides=None, order=None, function=None, index=(),
-              unbounded=False):
+    def __new__(cls, shape, dtype=float, buffer=None, offset=0, strides=None,
+            order=None, function=None, index=(), unbounded=False, start=0,
+            step=1):
         """
         Constructor for OnlineArray.
 
@@ -23,12 +23,18 @@ class OnlineArray(numpy.ndarray):
         :type index: tuple(int)
         :arg unbounded: Create an unbounded array.
         :type unbounded: bool
+        :arg start:
+        :type start: int
+        :arg step:
+        :type step: int
         """
         array = super(OnlineArray, cls).__new__(cls, shape, dtype, buffer,
             offset, strides, order)
         array.function = function
         array.index = index
         array.unbounded = unbounded
+        array.start = start
+        array.step = step
 
         return array
     #__new__
@@ -43,6 +49,12 @@ class OnlineArray(numpy.ndarray):
         :returns: Either a sub-array or an element.
         :rtype: OnlineArray or unknown
         """
+        if type(index) == slice:
+            return OnlineArray(self.shape, function=self.function,
+                index=self.index, unbounded=self.unbounded,
+                start=self.start + index.start, step=self.step * index.step)
+        #if
+
         if type(index) == tuple:
             # NumPy style indexing.
             checked_index = self._check_boundaries(index[0])
@@ -85,14 +97,16 @@ class OnlineArray(numpy.ndarray):
         :returns: Checked and corrected indices.
         :rtype: int
         """
+        result = index * self.step + self.start
+
         if self.unbounded:
-            return index
+            return result
 
         if not -self.shape[0] <= index < self.shape[0]:
             raise IndexError("index {} is out of bounds for axis {} with "
                 "size {}".format(index, self.ndim - 1, self.shape[0]))
 
-        return index % self.shape[0]
+        return result % self.shape[0]
     #_check_boundaries
 #OnlineArray
 
