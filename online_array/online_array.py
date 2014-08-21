@@ -58,21 +58,22 @@ class OnlineArray(numpy.ndarray):
 
         if type(index) == tuple:
             # NumPy style indexing.
-            checked_index = self._check_boundaries(index[0])
+            corrected_index = self._correct_index(index[0])
 
             if len(index) > 1:
                 return OnlineArray(self.shape[1:], function=self.function,
-                    index=self.index + (checked_index, ),
+                    index=self.index + (corrected_index, ),
                     unbounded=self.unbounded)[index[1:]]
         #if
         else:
-            checked_index = self._check_boundaries(index)
+            corrected_index = self._correct_index(index)
 
         if self.ndim > 1:
             return OnlineArray(self.shape[1:], function=self.function,
-                index=self.index + (checked_index, ), unbounded=self.unbounded)
+                index=self.index + (corrected_index, ),
+                unbounded=self.unbounded)
 
-        return self.function(*self.index + (checked_index, ))
+        return self.function(*self.index + (corrected_index, ))
     #__getitem__
 
     def __setitem__(self, index, value):
@@ -88,7 +89,7 @@ class OnlineArray(numpy.ndarray):
     def __repr__(self):
         return str(self.__class__)
 
-    def _check_boundaries(self, index):
+    def _correct_index(self, index):
         """
         Check the boundaries and correct for negative indices.
 
@@ -106,7 +107,7 @@ class OnlineArray(numpy.ndarray):
                 "size {}".format(index, self.ndim - 1, self.shape[0]))
 
         return (index % self.shape[0]) * self.step + self.start
-    #_check_boundaries
+    #_correct_index
 #OnlineArray
 
 def online_array(function, shape):
