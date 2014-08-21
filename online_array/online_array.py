@@ -50,10 +50,14 @@ class OnlineArray(numpy.ndarray):
         :rtype: OnlineArray or unknown
         """
         if type(index) == slice:
-            return OnlineArray((self.shape[0] - index.start,) + self.shape[1:],
+            corrected_slice = self._correct_slice(index)
+
+            return OnlineArray(
+                (self.shape[0] - corrected_slice.start,) + self.shape[1:],
                 function=self.function, index=self.index,
-                unbounded=self.unbounded, start=self.start + index.start,
-                step=self.step * index.step)
+                unbounded=self.unbounded,
+                start=self.start + corrected_slice.start,
+                step=self.step * corrected_slice.step)
         #if
 
         if type(index) == tuple:
@@ -83,8 +87,8 @@ class OnlineArray(numpy.ndarray):
     def __getslice__(self, a, b):
         return self.__getitem__(slice(a, b, 1))
 
-    def __str__(self):
-        return "{} contains no data".format(repr(self))
+    #def __str__(self):
+    #    return "{} contains no data".format(repr(self))
 
     def __repr__(self):
         return str(self.__class__)
@@ -108,6 +112,9 @@ class OnlineArray(numpy.ndarray):
 
         return (index % self.shape[0]) * self.step + self.start
     #_correct_index
+
+    def _correct_slice(self, index):
+        return slice(index.start or 0, index.stop or 0, index.step or 1)
 #OnlineArray
 
 def online_array(function, shape):

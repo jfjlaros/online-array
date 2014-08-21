@@ -222,4 +222,24 @@ class TestOnlineArray(object):
     def test_slicing_2(self):
         assert(self.arrays['1d']['online'][2:][0] ==
             self.arrays['1d']['online'][2])
+
+    def test_slicing_3(self):
+        self._test_content(self.arrays['1d']['online'][2:],
+            self.arrays['1d']['real'][2:])
+
+    def test_slicing_4(self):
+        self._test_content(self.arrays['1d']['online'][2:],
+            self.arrays['1d']['real'][2:])
+
+    def test_slicing_5(self):
+        self._test_content(self.arrays['1d']['online'][1:][1:],
+            self.arrays['1d']['real'][1:][1:])
+
+    def test_slicing_6(self):
+        self._test_content(self.arrays['1d']['online'][::],
+            self.arrays['1d']['real'][::])
+
+    #def test_slicing_6(self):
+    #    self._test_content(self.arrays['1d']['online'][1::2][1::2],
+    #        self.arrays['1d']['real'][1::2][1::2])
 #TestOnlineArray
