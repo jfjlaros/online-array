@@ -66,6 +66,9 @@ class OnlineArray(numpy.ndarray):
         raise TypeError("{} object does not support item assignment".format(
             repr(self)))
 
+    def __getslice__(self, a, b):
+        return self.__getitem__(slice(a, b, 1))
+
     def __str__(self):
         return "{} contains no data".format(repr(self))
 
