@@ -5,6 +5,7 @@ Tests for the `online_array` module.
 import numpy
 
 from online_array import online_array
+from online_array import utils
 
 class TestOnlineArray(object):
     def _f(self, x):
@@ -15,28 +16,6 @@ class TestOnlineArray(object):
 
     def _h(self, x, y, z):
         return x * y + z + 1
-
-    def _fill_array(self, real_array, function, index=(), depth=0):
-        """
-        Fill a real array with the values specified by {function}.
-
-        :arg real_array: A real numpy array.
-        :type real_array: ndarray
-        :arg function: Function that specifies the values.
-        :type function: function
-        :arg index: Index up to {depth} number of dimensions.
-        :type index: tuple(int)
-        :arg depth: Depth of the recursion.
-        :type depth: int
-        """
-        for i in range(real_array.shape[depth]):
-            if real_array.ndim > depth + 1:
-                self._fill_array(real_array, function, index=index + (i, ),
-                    depth=depth + 1)
-            else:
-                real_array[(index) + (i, )] = function(*(index) + (i, ))
-        #for
-    #_fill_array
 
     def _make_array_pair(self, shape, function):
         """
@@ -54,7 +33,7 @@ class TestOnlineArray(object):
         array = online_array.OnlineArray(shape, function=function)
 
         real_array = numpy.ndarray(shape)
-        self._fill_array(real_array, function)
+        utils.fill_array(real_array, function)
 
         return {'online': array, 'real': real_array}
     #_make_array_pair
