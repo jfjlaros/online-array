@@ -38,20 +38,6 @@ class TestOnlineArray(object):
         return {'online': array, 'real': real_array}
     #_make_array_pair
 
-    def setup(self):
-        """
-        Create some arrays.
-        """
-        self.arrays = {}
-
-        self.array_1 = self._make_array_pair((5, ), self._f)
-        self.array_2 = self._make_array_pair((4, 3), self._g)
-        self.array_3 = self._make_array_pair((4, 3, 5), self._h)
-
-        self.unbounded_array = online_array.OnlineArray((0, ),
-            function=self._f, unbounded=True)
-    #setup
-
     def _test_boundary(self, array, index):
         """
         Check whether an `IndexError` is raised.
@@ -129,6 +115,20 @@ class TestOnlineArray(object):
             return True
         return False
     #_test_assignment
+
+    def setup(self):
+        """
+        Create some arrays.
+        """
+        self.arrays = {}
+
+        self.array_1 = self._make_array_pair((5, ), self._f)
+        self.array_2 = self._make_array_pair((4, 3), self._g)
+        self.array_3 = self._make_array_pair((4, 3, 5), self._h)
+
+        self.unbounded_array = online_array.OnlineArray((0, ),
+            function=self._f, unbounded=True)
+    #setup
 
     def test_index_1(self):
         assert(self.array_2['online'][2][2] == 5)
