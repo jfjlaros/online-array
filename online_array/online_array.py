@@ -54,6 +54,7 @@ class OnlineArray(numpy.ndarray):
 
             return OnlineArray(
                 (self.shape[0] - corrected_slice.start,) + self.shape[1:],
+                dtype=self.dtype,
                 function=self.function, index=self.index,
                 unbounded=self.unbounded,
                 start=self.start + corrected_slice.start,
@@ -65,7 +66,8 @@ class OnlineArray(numpy.ndarray):
             corrected_index = self._correct_index(index[0])
 
             if len(index) > 1:
-                return OnlineArray(self.shape[1:], function=self.function,
+                return OnlineArray(self.shape[1:], dtype=self.dtype,
+                    function=self.function,
                     index=self.index + (corrected_index, ),
                     unbounded=self.unbounded)[index[1:]]
         #if
@@ -73,7 +75,8 @@ class OnlineArray(numpy.ndarray):
             corrected_index = self._correct_index(index)
 
         if self.ndim > 1:
-            return OnlineArray(self.shape[1:], function=self.function,
+            return OnlineArray(self.shape[1:], dtype=self.dtype,
+                function=self.function,
                 index=self.index + (corrected_index, ),
                 unbounded=self.unbounded)
 
@@ -87,8 +90,12 @@ class OnlineArray(numpy.ndarray):
     def __getslice__(self, a, b):
         return self.__getitem__(slice(a, b, 1))
 
-    #def __str__(self):
-    #    return "{} contains no data".format(repr(self))
+    def __str__(self):
+        if self.unbounded:
+            raise TypeError("{} cannot return unbounded content".format(
+                repr(self)))
+        return super(OnlineArray, self).__str__()
+    #__str__
 
     def __repr__(self):
         return str(self.__class__)
