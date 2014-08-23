@@ -122,6 +122,20 @@ class OnlineArray(numpy.ndarray):
 
     def _correct_slice(self, index):
         return slice(index.start or 0, index.stop or 0, index.step or 1)
+
+    def max(self):
+        if self.unbounded:
+            raise TypeError("{} cannot return unbounded content".format(
+                repr(self)))
+        return max([value for value in self])
+    #max
+
+    def min(self):
+        if self.unbounded:
+            raise TypeError("{} cannot return unbounded content".format(
+                repr(self)))
+        return min([value for value in self])
+    #min
 #OnlineArray
 
 def online_array(function, shape):
