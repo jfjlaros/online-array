@@ -33,6 +33,10 @@ class OnlineArray(numpy.ndarray):
     def _correct_slice(self, index):
         return slice(index.start or 0, index.stop or 0, index.step or 1)
 
+    def _raise_type_error(self):
+        raise TypeError("{} cannot return unbounded content".format(
+            repr(self)))
+
     def _protected_arithmetc_operation(self, function):
         """
         Protect arithmetic operations from unbounded arrays.
@@ -44,10 +48,13 @@ class OnlineArray(numpy.ndarray):
         :rtype: dtype
         """
         if self.unbounded:
-            raise TypeError("{} cannot return unbounded content".format(
-                repr(self)))
+            self._raise_type_error()
         return function([value for value in self])
     #_protected_arithmetc_operation
+
+    def _raise_assignment_error(self):
+        raise TypeError("{} object does not support item assignment".format(
+            repr(self)))
 
     def __new__(cls, shape, dtype=float, buffer=None, offset=0, strides=None,
             order=None, function=None, index=(), unbounded=False, start=0,
@@ -124,16 +131,20 @@ class OnlineArray(numpy.ndarray):
     #__getitem__
 
     def __setitem__(self, index, value):
-        raise TypeError("{} object does not support item assignment".format(
-            repr(self)))
+        self._raise_assignment_error()
+
+    def put(self, ind, v, mode='raise'):
+        self._raise_assignment_error()
+
+    def sort(self):
+        self._raise_assignment_error()
 
     def __getslice__(self, a, b):
         return self.__getitem__(slice(a, b, 1))
 
     def __str__(self):
         if self.unbounded:
-            raise TypeError("{} cannot return unbounded content".format(
-                repr(self)))
+            self._raise_type_error()
         return super(OnlineArray, self).__str__()
     #__str__
 

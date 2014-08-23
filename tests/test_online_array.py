@@ -111,7 +111,24 @@ class TestOnlineArray(object):
             else:
                 assert(array[(index) + (i, )] == mirror[(index) + (i, )])
         #for
-    #_fill_array
+    #_test_content
+
+    def _test_assignment(self, assignment_test):
+        """
+        Test whether an assignment fails.
+
+        :arg assignment_test: A python code snippet.
+        :type assignment_test: str
+
+        :returns: True if {assignment_test} fails with a TypeError.
+        :rtype: bool
+        """
+        try:
+            eval(assignment_test)
+        except TypeError:
+            return True
+        return False
+    #_test_assignment
 
     def test_index_1(self):
         assert(self.array_2['online'][2][2] == 5)
@@ -167,14 +184,14 @@ class TestOnlineArray(object):
     def test_unbounded_loop(self):
         assert(self._test_loop(self.unbounded_array, 10) == 9)
 
-    def test_assignment(self):
-        try:
-            self.array_1['online'][0] = 1
-        except TypeError:
-            pass
-        else:
-            raise TypeError("assignment check failed")
-    #test_assignment
+    def test_assignment_1(self):
+        assert("self.array_1['online'][0] = 1")
+
+    def test_assignment_2(self):
+        assert("self.array_1.put(0, 1)")
+
+    def test_assignment_3(self):
+        assert("self.array_1.sort()")
 
     def test_content_1(self):
         self._test_content(self.array_1['online'], self.array_1['real'])
