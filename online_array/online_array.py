@@ -10,31 +10,12 @@ class OnlineArray(numpy.ndarray):
     convenient when an array gets too large and the receiving function only
     accepts an array.
     """
-    def _correct_index(self, index):
-        """
-        Check the boundaries and correct for negative indices.
-
-        :arg index: The index of the element.
-        :type index: int
-
-        :returns: Checked and corrected indices.
-        :rtype: int
-        """
-        if self.unbounded:
-            return index * self.step + self.start
-
-        if not -self.shape[0] <= index < self.shape[0]:
-            raise IndexError("index {} is out of bounds for axis {} with "
-                "size {}".format(index, self.ndim - 1, self.shape[0]))
-
-        return (index % self.shape[0]) * self.step + self.start
-    #_correct_index
-
-    def _correct_slice(self, index):
-        return slice(index.start or 0, index.stop or 0, index.step or 1)
-
     def _raise_type_error(self):
         raise TypeError("{} cannot return unbounded content".format(
+            repr(self)))
+
+    def _raise_assignment_error(self):
+        raise TypeError("{} object does not support item assignment".format(
             repr(self)))
 
     def _protected_parent_call(self, function):
@@ -65,12 +46,32 @@ class OnlineArray(numpy.ndarray):
         """
         if self.unbounded:
             self._raise_type_error()
+
         return function([value for value in self])
     #_protected_arithmetc_operation
 
-    def _raise_assignment_error(self):
-        raise TypeError("{} object does not support item assignment".format(
-            repr(self)))
+    def _correct_index(self, index):
+        """
+        Check the boundaries and correct for negative indices.
+
+        :arg index: The index of the element.
+        :type index: int
+
+        :returns: Checked and corrected indices.
+        :rtype: int
+        """
+        if self.unbounded:
+            return index * self.step + self.start
+
+        if not -self.shape[0] <= index < self.shape[0]:
+            raise IndexError("index {} is out of bounds for axis {} with "
+                "size {}".format(index, self.ndim - 1, self.shape[0]))
+
+        return (index % self.shape[0]) * self.step + self.start
+    #_correct_index
+
+    def _correct_slice(self, index):
+        return slice(index.start or 0, index.stop or 0, index.step or 1)
 
     def __new__(cls, shape, dtype=float, buffer=None, offset=0, strides=None,
             order=None, function=None, index=(), unbounded=False, start=0,
@@ -145,16 +146,7 @@ class OnlineArray(numpy.ndarray):
 
         return self.function(*self.index + (corrected_index, ))
     #__getitem__
-
-    def __setitem__(self, index, value):
-        self._raise_assignment_error()
-
-    def put(self, ind, v, mode='raise'):
-        self._raise_assignment_error()
-
-    def sort(self):
-        self._raise_assignment_error()
-
+        
     def __getslice__(self, a, b):
         return self.__getitem__(slice(a, b, 1))
 
@@ -165,6 +157,7 @@ class OnlineArray(numpy.ndarray):
     def __str__(self):
         return self._protected_parent_call('__str__')
 
+    # Arithmetic operations.
     def max(self):
         return self._protected_arithmetc_operation(max)
 
@@ -183,6 +176,16 @@ class OnlineArray(numpy.ndarray):
 
     def all(self):
         return self._protected_arithmetc_operation(all)
+
+    # Unsupported operations.
+    def __setitem__(self, index, value):
+        self._raise_assignment_error()
+
+    def put(self, ind, v, mode='raise'):
+        self._raise_assignment_error()
+
+    def sort(self):
+        self._raise_assignment_error()
 #OnlineArray
 
 def online_array(function, shape):
