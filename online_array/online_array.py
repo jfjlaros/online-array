@@ -188,9 +188,12 @@ class OnlineArray(numpy.ndarray):
         self._raise_assignment_error()
 #OnlineArray
 
+def _get_dtype(function):
+    return type(function(*((0, ) * function.func_code.co_argcount)))
+
 def online_array(function, shape):
     """
-    Make an OnlineArray instance and initialise it.
+    Make an online array.
 
     :arg function: General function having only integer arguments.
     :type function: function(*(int))
@@ -198,5 +201,16 @@ def online_array(function, shape):
         on it).
     :type shape: tuple(int)
     """
-    return OnlineArray(shape, function=function)
+    return OnlineArray(shape, dtype=_get_dtype(function), function=function)
 #online_array
+
+def unbounded_online_array(function):
+    """
+    Make an unbounded online array.
+
+    :arg function: General function having only integer arguments.
+    :type function: function(*(int))
+    """
+    return OnlineArray((0, ) * function.func_code.co_argcount,
+        dtype=_get_dtype(function), function=function, unbounded=True)
+#unbounded_online_array
