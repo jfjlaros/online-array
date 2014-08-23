@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import numpy
+import operator
 
 class OnlineArray(numpy.ndarray):
     """
@@ -31,6 +32,22 @@ class OnlineArray(numpy.ndarray):
 
     def _correct_slice(self, index):
         return slice(index.start or 0, index.stop or 0, index.step or 1)
+
+    def _protected_arithmetc_operation(self, function):
+        """
+        Protect arithmetic operations from unbounded arrays.
+
+        :arg function: The arithmetic function.
+        :type function: function
+
+        :returns: The result of {function}.
+        :rtype: dtype
+        """
+        if self.unbounded:
+            raise TypeError("{} cannot return unbounded content".format(
+                repr(self)))
+        return function([value for value in self])
+    #_protected_arithmetc_operation
 
     def __new__(cls, shape, dtype=float, buffer=None, offset=0, strides=None,
             order=None, function=None, index=(), unbounded=False, start=0,
@@ -124,18 +141,17 @@ class OnlineArray(numpy.ndarray):
         return str(self.__class__)
 
     def max(self):
-        if self.unbounded:
-            raise TypeError("{} cannot return unbounded content".format(
-                repr(self)))
-        return max([value for value in self])
-    #max
+        return self._protected_arithmetc_operation(max)
 
     def min(self):
-        if self.unbounded:
-            raise TypeError("{} cannot return unbounded content".format(
-                repr(self)))
-        return min([value for value in self])
-    #min
+        return self._protected_arithmetc_operation(min)
+
+    def sum(self):
+        return self._protected_arithmetc_operation(sum)
+
+    def prod(self):
+        return self._protected_arithmetc_operation(
+            lambda value: reduce(operator.mul, value))
 #OnlineArray
 
 def online_array(function, shape):

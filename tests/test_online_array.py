@@ -221,4 +221,25 @@ class TestOnlineArray(object):
     #def test_slicing_6(self):
     #    self._test_content(self.arrays['1d']['online'][1::2][1::2],
     #        self.arrays['1d']['real'][1::2][1::2])
+
+    def test_max_1(self):
+        assert(max(self.arrays['1d']['online']) == 4)
+
+    def test_max_2(self):
+        assert(self.arrays['1d']['online'].max() == 4)
+
+    def test_min_1(self):
+        assert(min(self.arrays['1d']['online']) == 0)
+
+    def test_min_2(self):
+        assert(self.arrays['1d']['online'].min() == 0)
+
+    def test_sum_1(self):
+        assert(sum(self.arrays['1d']['online']) == 10)
+
+    def test_sum_2(self):
+        assert(self.arrays['1d']['online'].sum() == 10)
+
+    def test_prod(self):
+        assert(self.arrays['1d']['online'][1:].prod() == 24)
 #TestOnlineArray
