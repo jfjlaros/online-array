@@ -251,4 +251,10 @@ class TestOnlineArray(object):
 
     def test_prod(self):
         assert(self.array_1['online'][1:].prod() == 24)
+
+    def test_any(self):
+        assert(self.array_1['online'].any())
+
+    def test_all(self):
+        assert(not self.array_1['online'].all())
 #TestOnlineArray

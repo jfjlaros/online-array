@@ -163,6 +163,12 @@ class OnlineArray(numpy.ndarray):
     def prod(self):
         return self._protected_arithmetc_operation(
             lambda value: reduce(operator.mul, value))
+
+    def any(self):
+        return self._protected_arithmetc_operation(any)
+
+    def all(self):
+        return self._protected_arithmetc_operation(all)
 #OnlineArray
 
 def online_array(function, shape):
