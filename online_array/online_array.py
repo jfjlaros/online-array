@@ -37,6 +37,22 @@ class OnlineArray(numpy.ndarray):
         raise TypeError("{} cannot return unbounded content".format(
             repr(self)))
 
+    def _protected_parent_call(self, function):
+        """
+        Protect parent calls from unbounded arrays.
+
+        :arg function: The arithmetic function.
+        :type function: function
+
+        :returns: The result of {function}.
+        :rtype: unknown
+        """
+        if self.unbounded:
+            self._raise_type_error()
+
+        return getattr(super(OnlineArray, self), function)()
+    #_protected_parent_call
+
     def _protected_arithmetc_operation(self, function):
         """
         Protect arithmetic operations from unbounded arrays.
@@ -142,14 +158,12 @@ class OnlineArray(numpy.ndarray):
     def __getslice__(self, a, b):
         return self.__getitem__(slice(a, b, 1))
 
-    def __str__(self):
-        if self.unbounded:
-            self._raise_type_error()
-        return super(OnlineArray, self).__str__()
-    #__str__
-
+    # Protected parent functions.
     def __repr__(self):
-        return str(self.__class__)
+        return self._protected_parent_call('__repr__')
+
+    def __str__(self):
+        return self._protected_parent_call('__str__')
 
     def max(self):
         return self._protected_arithmetc_operation(max)
