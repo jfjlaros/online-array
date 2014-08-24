@@ -2,6 +2,7 @@
 
 import numpy
 import operator
+import sys
 
 class OnlineArray(numpy.ndarray):
     """
@@ -71,7 +72,8 @@ class OnlineArray(numpy.ndarray):
     #_correct_index
 
     def _correct_slice(self, index):
-        return slice(index.start or 0, index.stop or 0, index.step or 1)
+        return slice(index.start or 0, index.stop or sys.maxint,
+            index.step or 1)
 
     def __new__(cls, shape, dtype=float, buffer=None, offset=0, strides=None,
             order=None, function=None, index=(), unbounded=False, start=0,
@@ -117,11 +119,13 @@ class OnlineArray(numpy.ndarray):
             corrected_slice = self._correct_slice(index)
 
             return OnlineArray(
-                (self.shape[0] - corrected_slice.start,) + self.shape[1:],
+                ((min(self.shape[0], corrected_slice.stop) -
+                corrected_slice.start + corrected_slice.step - 0.5) //
+                corrected_slice.step, ) + self.shape[1:],
                 dtype=self.dtype,
                 function=self.function, index=self.index,
                 unbounded=self.unbounded,
-                start=self.start + corrected_slice.start,
+                start=self.start + (self.step * corrected_slice.start),
                 step=self.step * corrected_slice.step)
         #if
 

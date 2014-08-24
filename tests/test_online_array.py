@@ -227,9 +227,13 @@ class TestOnlineArray(object):
         self._test_content(self.array_1['online'][::],
             self.array_1['real'][::])
 
-    #def test_slicing_6(self):
-    #    self._test_content(self.array_1['online'][1::2][1::2],
-    #        self.array_1['real'][1::2][1::2])
+    def test_slicing_7(self):
+        self._test_content(self.array_1['online'][1:3:2],
+            self.array_1['real'][1:3:2])
+
+    def test_slicing_8(self):
+        self._test_content(self.array_1['online'][1::2][1::2],
+            self.array_1['real'][1::2][1::2])
 
     def test_max_1(self):
         assert(max(self.array_1['online']) == 4)
