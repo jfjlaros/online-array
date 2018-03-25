@@ -1,0 +1,3 @@
+online_array/*.pyc
+.pytest_cache/
+tests/__pycache__/

@@ -1,35 +1,40 @@
-"""
-This module provides an array-like object that calls an arbitrary function when
-the value of an element is requested.
+"""This module provides an array-like object that calls an arbitrary function
+when the value of an element is requested.
 
 
-Copyright (c) 2014 Leiden University Medical Center <humgen@lumc.nl>
-Copyright (c) 2014 Jeroen F.J. Laros <j.f.j.laros@lumc.nl>
+Copyright (c) 2014 Jeroen F.J. Laros <J.F.J.Laros@lumc.nl>
 
 Licensed under the MIT license, see the LICENSE file.
 """
-
 import argparse
 import os
 
-__version_info__ = ('0', '0', '0')
+from .online_array import OnlineArray, online_array, unbounded_online_array
+from .utils import fill_array
+
+
+__version_info__ = ('0', '0', '1')
 
 __version__ = '.'.join(__version_info__)
-__author__ = 'LUMC, Jeroen F.J. Laros'
+__author__ = 'Jeroen F.J. Laros'
 __contact__ = 'J.F.J.Laros@lumc.nl'
-__homepage__ = 'https://git.lumc.nl/j.f.j.laros/online-array'
+__homepage__ = 'https://github.com/jfjlaros/online-array.git'
 
-usage = __doc__.split("\n\n\n")
+usage = __doc__.split('\n\n\n')
+
 
 class ProtectedFileType(argparse.FileType):
     def __call__(self, string):
         if 'w' in self._mode and os.path.exists(string):
             raise IOError('failed to create "{}": file exists.'.format(string))
+
         return super(ProtectedFileType, self).__call__(string)
 
+
 def doc_split(func):
-    return func.__doc__.split("\n\n")[0]
+    return func.__doc__.split('\n\n')[0]
+
 
 def version(name):
-    return "%s version %s\n\nAuthor   : %s <%s>\nHomepage : %s" % (name,
-        __version__, __author__, __contact__, __homepage__)
+    return '{} version {}\n\nAuthor   : {} <{}>\nHomepage : {}'.format(
+        name, __version__, __author__, __contact__, __homepage__)
